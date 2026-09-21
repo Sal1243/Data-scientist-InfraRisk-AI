@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mohamed Salman · GitHub Profile Explorer</title>
+  <meta name="description" content="Interactive, data-rich profile explorer for Mohamed Salman (@Sal1243) — AI Automation Engineer & Web Developer." />
+
+  <!-- Tailwind via CDN (no build step) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            gh: { bg:'#0d1117', surface:'#161b22', border:'#30363d',
+                  accent:'#58a6ff', text:'#e6edf3', muted:'#8b949e',
+                  green:'#3fb950', purple:'#a371f7', orange:'#d29922',
+                  pink:'#db61a2', red:'#f85149', blue:'#58a6ff' }
+          },
+          keyframes: {
+            fadeUp:  { '0%':{opacity:0,transform:'translateY(12px)'},
+                       '100%':{opacity:1,transform:'translateY(0)'} },
+            pulseDot:{ '0%,100%':{opacity:1},'50%':{opacity:.35} },
+            shimmer: { '0%':{backgroundPosition:'-400px 0'},
+                       '100%':{backgroundPosition:'400px 0'} }
+          },
+          animation: {
+            'fade-up':'fadeUp .6s ease-out both',
+            'pulse-dot':'pulseDot 1.4s ease-in-out infinite',
+            'shimmer':'shimmer 1.6s linear infinite'
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    html, body { background:#0d1117; color:#e6edf3; }
+    body { font-family:'Inter', system-ui, sans-serif; }
+    .mono { font-family:'JetBrains Mono', ui-monospace, monospace; }
+    .glass { background:rgba(22,27,34,.65); backdrop-filter: blur(10px); }
+    .card  { background:#161b22; border:1px solid #30363d; transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+    .card:hover { transform:translateY(-3px); border-color:#58a6ff; box-shadow:0 8px 30px rgba(88,166,255,.08); }
+    .badge { display:inline-flex; align-items:center; gap:.35rem; font-size:.7rem;
+             padding:.2rem .55rem; border-radius:9999px; background:#21262d; color:#c9d1d9;
+             border:1px solid #30363d; }
+    .badge-dot { width:.55rem; height:.55rem; border-radius:9999px; display:inline-block; }
+    .lang-py   { background:#3572A5; }
+    .lang-ts   { background:#3178c6; }
+    .lang-html { background:#e34c26; }
+    .lang-css  { background:#563d7c; }
+    .lang-other{ background:#8b949e; }
+    .skel { background:linear-gradient(90deg,#161b22 0%,#1f2630 50%,#161b22 100%);
+            background-size:800px 100%; animation:shimmer 1.6s linear infinite; }
+    .grid-bg { background-image:
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0);
+        background-size: 22px 22px; }
+    .glow-ring { box-shadow:0 0 0 1px #58a6ff, 0 0 30px rgba(88,166,255,.45); }
+    .scrollbar-thin::-webkit-scrollbar { height:6px; width:6px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background:#30363d; border-radius:3px; }
+    details > summary { list-style:none; cursor:pointer; }
+    details > summary::-webkit-details-marker { display:none; }
+    .gradient-text {
+      background: linear-gradient(90deg,#58a6ff 0%,#a371f7 50%,#db61a2 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .chip-active { background:#1f6feb22 !important; border-color:#58a6ff !important; color:#58a6ff !important; }
+  </style>
+</head>
+
+<body class="antialiased">
+
+<!-- =============== TOP NAV =============== -->
+<header class="sticky top-0 z-40 glass border-b border-gh-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2 font-semibold tracking-tight">
+      <span class="w-7 h-7 rounded-md bg-gradient-to-br from-gh-accent via-purple-500 to-pink-500 grid place-items-center text-white text-sm font-bold">M</span>
+      <span>Salman<span class="text-gh-muted">/profile</span></span>
+    </a>
+    <nav class="hidden md:flex items-center gap-6 text-sm text-gh-muted">
+      <a href="#about"      class="hover:text-gh-text">About</a>
+      <a href="#stats"      class="hover:text-gh-text">Stats</a>
+      <a href="#stack"      class="hover:text-gh-text">Stack</a>
+      <a href="#projects"   class="hover:text-gh-text">Projects</a>
+      <a href="#timeline"   class="hover:text-gh-text">Timeline</a>
+      <a href="#contact"    class="hover:text-gh-text">Contact</a>
+    </nav>
+    <a href="https://github.com/Sal1243" target="_blank" rel="noopener"
+       class="text-sm px-3 py-1.5 rounded-md border border-gh-border hover:border-gh-accent hover:text-gh-accent transition">
+      GitHub ↗
+    </a>
+  </div>
+</header>
+
+<!-- =============== HERO =============== -->
+<section id="top" class="relative overflow-hidden border-b border-gh-border">
+  <div class="absolute inset-0 grid-bg opacity-50"></div>
+  <div class="absolute -top-40 -right-40 w-[28rem] h-[28rem] rounded-full bg-gh-accent/10 blur-3xl"></div>
+  <div class="absolute -bottom-40 -left-40 w-[28rem] h-[28rem] rounded-full bg-purple-500/10 blur-3xl"></div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 grid md:grid-cols-[auto,1fr] gap-10 items-center">
+    <!-- Avatar -->
+    <div class="relative">
+      <div id="avatarWrap" class="w-36 h-36 md:w-44 md:h-44 rounded-full glow-ring overflow-hidden bg-gh-surface grid place-items-center">
+        <span class="text-5xl font-bold gradient-text">MS</span>
+      </div>
+      <span class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-gh-green border-4 border-gh-bg" title="Active"></span>
+    </div>
+
+    <!-- Text -->
+    <div id="heroText">
+      <p class="text-gh-muted text-sm tracking-widest uppercase mb-2 animate-fade-up">AI Automation Engineer · Web Developer</p>
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight animate-fade-up" style="animation-delay:.05s">
+        Hi, I'm <span class="gradient-text" id="heroName">Mohamed Salman</span>
+      </h1>
+      <p id="heroBio" class="mt-5 text-gh-muted max-w-2xl leading-relaxed animate-fade-up" style="animation-delay:.1s">
+        Building intelligent systems that automate operations, generate leads, and improve customer
+        experiences — combining AI, modern web dev, and rapid "vibe coding" prototyping.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-2 animate-fade-up" style="animation-delay:.15s" id="heroChips">
+        <!-- filled by JS -->
+      </div>
+      <div class="mt-8 flex flex-wrap gap-3 animate-fade-up" style="animation-delay:.2s">
+        <a href="#projects" class="px-5 py-2.5 rounded-md bg-gh-accent text-white font-medium hover:opacity-90">View Projects</a>
+        <a href="https://portfolio-sal1243s-projects.vercel.app" target="_blank" rel="noopener"
+           class="px-5 py-2.5 rounded-md border border-gh-border hover:border-gh-accent">Portfolio ↗</a>
+        <a href="#contact" class="px-5 py-2.5 rounded-md border border-gh-border hover:border-gh-accent">Get in touch</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============== STATS STRIP =============== -->
+<section id="stats" class="border-b border-gh-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-2 md:grid-cols-5 gap-4" id="statsGrid">
+    <!-- skeleton -->
+    <div class="card rounded-xl p-5"><div class="skel h-8 w-16 rounded mb-2"></div><div class="skel h-3 w-24 rounded"></div></div>
+    <div class="card rounded-xl p-5"><div class="skel h-8 w-16 rounded mb-2"></div><div class="skel h-3 w-24 rounded"></div></div>
+    <div class="card rounded-xl p-5"><div class="skel h-8 w-16 rounded mb-2"></div><div class="skel h-3 w-24 rounded"></div></div>
+    <div class="card rounded-xl p-5"><div class="skel h-8 w-16 rounded mb-2"></div><div class="skel h-3 w-24 rounded"></div></div>
+    <div class="card rounded-xl p-5 col-span-2 md:col-span-1"><div class="skel h-8 w-16 rounded mb-2"></div><div class="skel h-3 w-24 rounded"></div></div>
+  </div>
+</section>
+
+<!-- =============== ABOUT + LANG CHART =============== -->
+<section id="about" class="border-b border-gh-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-14 grid lg:grid-cols-[1.1fr,1fr] gap-10">
+
+    <div>
+      <p class="text-gh-accent text-sm tracking-widest uppercase">About</p>
+      <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-6">What I build</h2>
+      <p class="text-gh-muted leading-relaxed">
+        I design and ship <span class="text-gh-text font-medium">AI agents, voice assistants, and
+        business workflow automations</span> — from WhatsApp appointment booking and lead-qualification
+        voice bots to n8n pipelines that capture and nurture leads. On the web side I build
+        responsive apps and REST APIs with React and Node.
+      </p>
+
+      <ul class="mt-6 grid sm:grid-cols-2 gap-3 text-sm">
+        <li class="card rounded-lg p-3 flex gap-3"><span>✅</span> AI Agents & Voice Assistants</li>
+        <li class="card rounded-lg p-3 flex gap-3"><span>✅</span> WhatsApp Automation</li>
+        <li class="card rounded-lg p-3 flex gap-3"><span>✅</span> Lead-Gen & Follow-Up Flows</li>
+        <li class="card rounded-lg p-3 flex gap-3"><span>✅</span> Appointment Booking Systems</li>
+        <li class="card rounded-lg p-3 flex gap-3"><span>✅</span> n8n Workflow Automation</li>
+        <li class="card rounded-lg p-3 flex gap-3"><span>✅</span> React.js + REST APIs</li>
+      </ul>
+
+      <div class="mt-8 card rounded-xl p-5">
+        <p class="text-sm text-gh-muted mb-3">Recent highlights</p>
+        <ul class="space-y-2 text-sm">
+          <li class="flex gap-2"><span class="text-gh-accent">▸</span> Built an AI-powered WhatsApp Appointment Booking System</li>
+          <li class="flex gap-2"><span class="text-gh-accent">▸</span> Developed Voice AI Agents for lead qualification</li>
+          <li class="flex gap-2"><span class="text-gh-accent">▸</span> Automated lead capture & nurture workflows</li>
+          <li class="flex gap-2"><span class="text-gh-accent">▸</span> Shipped responsive web apps + custom API integrations</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Language donut -->
+    <div class="card rounded-xl p-6">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-semibold">Language distribution</h3>
+        <span class="text-xs text-gh-muted">across 24 repos</span>
+      </div>
+      <div class="relative h-72">
+        <canvas id="langChart"></canvas>
+      </div>
+      <div id="langLegend" class="mt-4 grid grid-cols-2 gap-2 text-sm"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =============== TECH STACK =============== -->
+<section id="stack" class="border-b border-gh-border bg-[#0b0f14]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+    <p class="text-gh-accent text-sm tracking-widest uppercase">Toolbox</p>
+    <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-8">Technologies & Tools</h2>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4" id="stackGrid">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- =============== PROJECTS =============== -->
+<section id="projects" class="border-b border-gh-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+      <div>
+        <p class="text-gh-accent text-sm tracking-widest uppercase">Work</p>
+        <h2 class="text-3xl md:text-4xl font-bold mt-2">Public Projects <span id="repoCount" class="text-gh-muted text-2xl font-medium"></span></h2>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+        <input id="search" type="search" placeholder="🔎  Search repos…"
+               class="bg-gh-surface border border-gh-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gh-accent w-full sm:w-72" />
+        <select id="langFilter"
+                class="bg-gh-surface border border-gh-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gh-accent">
+          <option value="">All languages</option>
+        </select>
+        <select id="sortBy"
+                class="bg-gh-surface border border-gh-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gh-accent">
+          <option value="updated">Recently updated</option>
+          <option value="created">Newest</option>
+          <option value="stars">Most stars</option>
+          <option value="name">Name (A→Z)</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="langChips" class="flex flex-wrap gap-2 mb-6"></div>
+
+    <div id="repoGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- skeleton cards -->
+      <div class="card rounded-xl p-5"><div class="skel h-5 w-2/3 rounded mb-3"></div><div class="skel h-3 w-full rounded mb-2"></div><div class="skel h-3 w-5/6 rounded"></div></div>
+      <div class="card rounded-xl p-5"><div class="skel h-5 w-2/3 rounded mb-3"></div><div class="skel h-3 w-full rounded mb-2"></div><div class="skel h-3 w-5/6 rounded"></div></div>
+      <div class="card rounded-xl p-5"><div class="skel h-5 w-2/3 rounded mb-3"></div><div class="skel h-3 w-full rounded mb-2"></div><div class="skel h-3 w-5/6 rounded"></div></div>
+    </div>
+
+    <p id="emptyState" class="hidden text-center text-gh-muted mt-10">No repos match your filter.</p>
+  </div>
+</section>
+
+<!-- =============== TIMELINE =============== -->
+<section id="timeline" class="border-b border-gh-border bg-[#0b0f14]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+    <p class="text-gh-accent text-sm tracking-widest uppercase">History</p>
+    <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-8">Activity Timeline</h2>
+    <div id="timelineEl" class="relative pl-6 border-l-2 border-gh-border space-y-6"></div>
+  </div>
+</section>
+
+<!-- =============== CONTACT =============== -->
+<section id="contact" class="border-b border-gh-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-14 grid md:grid-cols-2 gap-10 items-center">
+    <div>
+      <p class="text-gh-accent text-sm tracking-widest uppercase">Contact</p>
+      <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-4">Let's build something together</h2>
+      <p class="text-gh-muted leading-relaxed">
+        Open to freelance projects, collaborations, and new opportunities in AI automation
+        and web development. The fastest way to reach me is email or LinkedIn.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href="mailto:salmanpno88@gmail.com"
+           class="px-4 py-2 rounded-md bg-gh-accent text-white font-medium hover:opacity-90">✉ Email</a>
+        <a href="https://www.linkedin.com/in/mohamed-salman-a-s-6b23a722b/" target="_blank" rel="noopener"
+           class="px-4 py-2 rounded-md border border-gh-border hover:border-gh-accent">LinkedIn</a>
+        <a href="https://www.instagram.com/muhammadsalman_ibn_samad/" target="_blank" rel="noopener"
+           class="px-4 py-2 rounded-md border border-gh-border hover:border-gh-accent">Instagram</a>
+        <a href="https://portfolio-sal1243s-projects.vercel.app" target="_blank" rel="noopener"
+           class="px-4 py-2 rounded-md border border-gh-border hover:border-gh-accent">Portfolio ↗</a>
+      </div>
+    </div>
+
+    <div class="card rounded-xl p-6">
+      <h3 class="font-semibold mb-3">GitHub Stats (live)</h3>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div><div class="text-gh-muted">Public repos</div><div id="cs_repos" class="text-2xl font-bold">—</div></div>
+        <div><div class="text-gh-muted">Followers</div><div id="cs_followers" class="text-2xl font-bold">—</div></div>
+        <div><div class="text-gh-muted">Following</div><div id="cs_following" class="text-2xl font-bold">—</div></div>
+        <div><div class="text-gh-muted">Member since</div><div id="cs_since" class="text-2xl font-bold">—</div></div>
+      </div>
+      <div class="mt-5 pt-5 border-t border-gh-border">
+        <div class="text-gh-muted text-sm mb-2">Contribution activity</div>
+        <div class="grid grid-cols-12 gap-1" id="contribGrid" aria-label="Last 12 weeks of activity"></div>
+        <div class="flex items-center justify-between text-xs text-gh-muted mt-2">
+          <span>Less</span>
+          <span class="flex gap-1">
+            <span class="w-3 h-3 rounded-sm bg-[#161b22] border border-gh-border"></span>
+            <span class="w-3 h-3 rounded-sm bg-[#0e4429]"></span>
+            <span class="w-3 h-3 rounded-sm bg-[#006d32]"></span>
+            <span class="w-3 h-3 rounded-sm bg-[#26a641]"></span>
+            <span class="w-3 h-3 rounded-sm bg-[#39d353]"></span>
+          </span>
+          <span>More</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============== FOOTER =============== -->
+<footer class="border-t border-gh-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-gh-muted">
+    <p>© <span id="year"></span> Mohamed Salman · Built with ❤️ by Arena Agent</p>
+    <p class="mono">v1.0.0 · pulls live data from api.github.com</p>
+  </div>
+</footer>
+
+<!-- =============== BANNER =============== -->
+<div id="banner" class="hidden fixed bottom-4 right-4 z-50 max-w-sm card rounded-lg p-4 text-sm border-l-4 border-l-gh-orange"></div>
+
+<!-- =============== APP LOGIC =============== -->
+<script>
+/* ---------- Config ---------- */
+const GH_USER = 'Sal1243';
+const GH_API  = 'https://api.github.com';
+
+/* ---------- Cache ---------- */
+const cache = {
+  ttl: 5 * 60 * 1000,           // 5 minutes
+  async get(key, fetcher) {
+    const raw = sessionStorage.getItem(key);
+    if (raw) {
+      try {
+        const { ts, data } = JSON.parse(raw);
+        if (Date.now() - ts < this.ttl) return data;
+      } catch {}
+    }
+    const data = await fetcher();
+    sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+    return data;
+  }
+};
+
+/* ---------- Helpers ---------- */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+const escapeHtml = (s) => (s || '').replace(/[&<>"']/g, (c) =>
+  ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+
+const langColor = (lang) => ({
+  Python:'lang-py', TypeScript:'lang-ts', HTML:'lang-html', CSS:'lang-css',
+  JavaScript:'lang-html'
+}[lang] || 'lang-other');
+
+const formatDate = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+};
+
+const showBanner = (msg, type='info') => {
+  const el = $('#banner');
+  el.className = `fixed bottom-4 right-4 z-50 max-w-sm card rounded-lg p-4 text-sm border-l-4 ${
+    type==='error' ? 'border-l-gh-red' : 'border-l-gh-orange'}`;
+  el.innerHTML = msg;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 6000);
+};
+
+/* ---------- Data fetching ---------- */
+async function fetchProfile() {
+  return cache.get('profile', async () => {
+    const r = await fetch(`${GH_API}/users/${GH_USER}`);
+    if (!r.ok) throw new Error(`Profile ${r.status}`);
+    return r.json();
+  });
+}
+async function fetchRepos() {
+  return cache.get('repos', async () => {
+    const r = await fetch(`${GH_API}/users/${GH_USER}/repos?per_page=100&sort=updated`);
+    if (!r.ok) throw new Error(`Repos ${r.status}`);
+    return r.json();
+  });
+}
+async function fetchReadme() {
+  return cache.get('readme', async () => {
+    const r = await fetch(`${GH_API}/repos/${GH_USER}/${GH_USER}/readme`);
+    if (!r.ok) return null;
+    const j = await r.json();
+    return atob(j.content.replace(/\n/g, ''));
+  });
+}
+
+/* ---------- Renderers ---------- */
+function renderHero(p, readme) {
+  if (p.avatar_url) {
+    $('#avatarWrap').innerHTML =
+      `<img src="${p.avatar_url}" alt="${escapeHtml(p.name||p.login)}" class="w-full h-full object-cover" />`;
+  }
+  if (p.name) $('#heroName').textContent = p.name;
+  if (p.bio)  $('#heroBio').textContent  = p.bio;
+
+  const chips = [];
+  if (p.location)  chips.push(['📍', p.location]);
+  if (p.company)   chips.push(['🏢', p.company]);
+  if (p.blog)      chips.push(['↗', 'portfolio']);
+  if (p.html_url)  chips.push(['🐙', '@' + p.login]);
+  $('#heroChips').innerHTML = chips.map(([i,t]) =>
+    `<span class="badge"><span>${i}</span><span>${escapeHtml(t)}</span></span>`
+  ).join('');
+}
+
+function renderStats(profile, repos) {
+  const langs = aggregateLanguages(repos);
+  const top   = Object.entries(langs).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
+  const years = new Date().getFullYear() - new Date(profile.created_at).getFullYear();
+
+  const stats = [
+    ['Public repos',  profile.public_repos,     '📦'],
+    ['Followers',     profile.followers,        '👥'],
+    ['Following',     profile.following,        '➡'],
+    ['Years on GH',   years + ' yrs',           '⏳'],
+    ['Top language',  top,                      '⭐'],
+  ];
+
+  $('#statsGrid').innerHTML = stats.map(([label,val,icon]) => `
+    <div class="card rounded-xl p-5 animate-fade-up">
+      <div class="flex items-center justify-between">
+        <div class="text-3xl font-extrabold tracking-tight">${val}</div>
+        <div class="text-2xl opacity-70">${icon}</div>
+      </div>
+      <div class="mt-1 text-sm text-gh-muted">${label}</div>
+    </div>`).join('');
+
+  // contact-side stats
+  $('#cs_repos').textContent     = profile.public_repos;
+  $('#cs_followers').textContent = profile.followers;
+  $('#cs_following').textContent = profile.following;
+  $('#cs_since').textContent     = new Date(profile.created_at).getFullYear();
+}
+
+function aggregateLanguages(repos) {
+  const map = {};
+  for (const r of repos) {
+    const l = r.language || 'Other';
+    map[l] = (map[l] || 0) + 1;
+  }
+  return map;
+}
+
+let langChart;
+function renderLangChart(repos) {
+  const map = aggregateLanguages(repos);
+  const labels = Object.keys(map);
+  const data   = Object.values(map);
+  const palette = [
+    '#3572A5','#3178c6','#e34c26','#563d7c','#f1e05a',
+    '#dea584','#b07219','#00ADD8','#A51C30','#8b949e'
+  ];
+
+  const ctx = $('#langChart').getContext('2d');
+  if (langChart) langChart.destroy();
+  langChart = new Chart(ctx, {
+    type:'doughnut',
+    data:{ labels, datasets:[{
+      data,
+      backgroundColor: labels.map((_,i)=>palette[i%palette.length]),
+      borderColor:'#0d1117', borderWidth:3, hoverOffset:8
+    }]},
+    options:{
+      cutout:'65%',
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          backgroundColor:'#161b22', borderColor:'#30363d', borderWidth:1,
+          titleColor:'#e6edf3', bodyColor:'#e6edf3',
+          callbacks:{ label:(c)=>` ${c.label}: ${c.parsed} repo${c.parsed>1?'s':''}` }
+        }
+      }
+    }
+  });
+
+  $('#langLegend').innerHTML = labels.map((l,i) => `
+    <div class="flex items-center gap-2">
+      <span class="w-3 h-3 rounded-sm" style="background:${palette[i%palette.length]}"></span>
+      <span class="text-gh-muted">${l}</span>
+      <span class="ml-auto text-gh-text font-medium">${map[l]}</span>
+    </div>`).join('');
+}
+
+const techStack = [
+  { name:'React',          icon:'⚛',  color:'#61dafb', group:'Frontend' },
+  { name:'TypeScript',     icon:'🟦', color:'#3178c6', group:'Language' },
+  { name:'JavaScript',     icon:'🟨', color:'#f1e05a', group:'Language' },
+  { name:'Python',         icon:'🐍', color:'#3572A5', group:'Language' },
+  { name:'Node.js',        icon:'🟩', color:'#3c873a', group:'Backend' },
+  { name:'FastAPI',        icon:'⚡', color:'#009485', group:'Backend' },
+  { name:'Django',         icon:'🌿', color:'#092e20', group:'Backend' },
+  { name:'n8n',            icon:'🔁', color:'#ff6d5a', group:'Automation' },
+  { name:'OpenAI API',     icon:'🧠', color:'#10a37f', group:'AI' },
+  { name:'Supabase',       icon:'🟢', color:'#3ECF8E', group:'Data' },
+  { name:'Firebase',       icon:'🔥', color:'#FFCA28', group:'Data' },
+  { name:'MongoDB',        icon:'🍃', color:'#4ea94b', group:'Data' },
+  { name:'MySQL',          icon:'🐬', color:'#4479A1', group:'Data' },
+  { name:'Vercel',         icon:'▲',  color:'#ffffff', group:'Deploy' },
+  { name:'Render',         icon:'🟣', color:'#46E3B7', group:'Deploy' },
+  { name:'Figma',          icon:'🎨', color:'#F24E1E', group:'Design' },
+  { name:'Git & GitHub',   icon:'🔧', color:'#f05033', group:'Tools' },
+  { name:'Pandas / NumPy', icon:'📊', color:'#150458', group:'Data' },
+];
+
+function renderStack() {
+  const groups = [...new Set(techStack.map(t => t.group))];
+  $('#stackGrid').innerHTML = groups.map(g => {
+    const items = techStack.filter(t => t.group === g);
+    return `
+      <div class="card rounded-xl p-5 animate-fade-up">
+        <div class="text-xs uppercase tracking-widest text-gh-muted mb-3">${g}</div>
+        <div class="flex flex-wrap gap-2">
+          ${items.map(t => `
+            <span class="badge" title="${t.name}">
+              <span style="color:${t.color}">${t.icon}</span> ${t.name}
+            </span>`).join('')}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function repoCard(repo) {
+  const lang = repo.language || 'Other';
+  return `
+    <a href="${repo.html_url}" target="_blank" rel="noopener"
+       class="card rounded-xl p-5 group block animate-fade-up">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#8b949e"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 1 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 0 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.493 2.493 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.25.25 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/></svg>
+            <h3 class="font-semibold text-gh-accent truncate group-hover:underline">${escapeHtml(repo.name)}</h3>
+          </div>
+          <p class="text-sm text-gh-muted line-clamp-2 min-h-[2.5rem]">
+            ${escapeHtml(repo.description || 'No description provided.')}
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center justify-between text-xs text-gh-muted">
+        <div class="flex items-center gap-3">
+          <span class="flex items-center gap-1.5">
+            <span class="badge-dot ${langColor(lang)}"></span>${lang}
+          </span>
+          ${repo.stargazers_count ? `<span class="flex items-center gap-1">⭐ ${repo.stargazers_count}</span>` : ''}
+          ${repo.forks_count      ? `<span class="flex items-center gap-1">🍴 ${repo.forks_count}</span>` : ''}
+        </div>
+        <span>${formatDate(repo.updated_at)}</span>
+      </div>
+    </a>`;
+}
+
+function renderRepos(repos) {
+  // populate language filter
+  const langs = [...new Set(repos.map(r => r.language || 'Other'))].sort();
+  const sel = $('#langFilter');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">All languages</option>' +
+    langs.map(l => `<option ${l===current?'selected':''}>${l}</option>`).join('');
+
+  // populate chip row
+  const langCounts = aggregateLanguages(repos);
+  $('#langChips').innerHTML = [
+    `<button class="badge chip-active" data-lang="">All · ${repos.length}</button>`,
+    ...Object.entries(langCounts).sort((a,b)=>b[1]-a[1]).map(([l,c]) =>
+      `<button class="badge" data-lang="${l}"><span class="badge-dot ${langColor(l)}"></span>${l} · ${c}</button>`)
+  ].join('');
+  $$('#langChips button').forEach(btn => {
+    btn.onclick = () => {
+      $$('#langChips button').forEach(b => b.classList.remove('chip-active'));
+      btn.classList.add('chip-active');
+      $('#langFilter').value = btn.dataset.lang;
+      filterAndRender();
+    };
+  });
+
+  $('#repoCount').textContent = `(${repos.length})`;
+  filterAndRender(repos);
+}
+
+let ALL_REPOS = [];
+function filterAndRender(prefilter) {
+  const repos = prefilter || ALL_REPOS;
+  const q    = ($('#search').value || '').toLowerCase().trim();
+  const lang = $('#langFilter').value;
+  const sort = $('#sortBy').value;
+
+  let out = repos.filter(r => {
+    const matchesQ    = !q    || r.name.toLowerCase().includes(q) || (r.description||'').toLowerCase().includes(q);
+    const matchesLang = !lang || (r.language || 'Other') === lang;
+    return matchesQ && matchesLang;
+  });
+
+  if (sort === 'updated') out.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at));
+  if (sort === 'created') out.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  if (sort === 'stars')   out.sort((a,b) => b.stargazers_count - a.stargazers_count);
+  if (sort === 'name')    out.sort((a,b) => a.name.localeCompare(b.name));
+
+  $('#repoGrid').innerHTML = out.length
+    ? out.map(repoCard).join('')
+    : '';
+  $('#emptyState').classList.toggle('hidden', out.length !== 0);
+}
+
+function renderTimeline(repos) {
+  const buckets = {};
+  for (const r of repos) {
+    const y = new Date(r.created_at).getFullYear();
+    buckets[y] = (buckets[y] || 0) + 1;
+  }
+  const years = Object.keys(buckets).sort((a,b)=>b-a);
+  $('#timelineEl').innerHTML = years.map(y => `
+    <div class="relative">
+      <span class="absolute -left-[1.7rem] top-1.5 w-4 h-4 rounded-full bg-gh-accent border-4 border-gh-bg"></span>
+      <div class="card rounded-lg p-4">
+        <div class="flex items-center justify-between">
+          <div class="font-semibold">${y}</div>
+          <div class="text-xs text-gh-muted">${buckets[y]} new repo${buckets[y]>1?'s':''}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderContribGrid() {
+  // Deterministic pseudo-activity for visual demo (last 12 weeks)
+  // (GitHub's real contribution graph requires auth/scrape — kept honest here)
+  const g = $('#contribGrid');
+  const cells = 12 * 7;
+  let html = '';
+  let seed = 0;
+  for (let i = 0; i < cells; i++) {
+    seed = (seed * 9301 + 49297) % 233280;
+    const r = seed / 233280;
+    const level = r < 0.55 ? 0 : r < 0.75 ? 1 : r < 0.88 ? 2 : r < 0.96 ? 3 : 4;
+    const color = ['#161b22','#0e4429','#006d32','#26a641','#39d353'][level];
+    html += `<span title="level ${level}" class="w-full h-3 rounded-sm" style="background:${color};border:1px solid #30363d"></span>`;
+  }
+  g.innerHTML = html;
+  g.classList.add('invisible'); // hidden by default unless you wire to real data
+}
+
+/* ---------- Boot ---------- */
+(async function init() {
+  $('#year').textContent = new Date().getFullYear();
+  renderStack();
+  renderContribGrid();
+
+  try {
+    const [profile, repos, readme] = await Promise.all([
+      fetchProfile(), fetchRepos(), fetchReadme().catch(()=>null)
+    ]);
+    renderHero(profile, readme);
+    renderStats(profile, repos);
+    renderLangChart(repos);
+    ALL_REPOS = repos;
+    renderRepos(repos);
+    renderTimeline(repos);
+  } catch (e) {
+    console.error(e);
+    showBanner(
+      `⚠ Could not load GitHub data (rate-limited or offline). Showing fallback.<br>
+       <span class="text-gh-muted">${escapeHtml(e.message)}</span>`, 'error');
+    renderFallback();
+  }
+
+  ['search','langFilter','sortBy'].forEach(id =>
+    $('#'+id).addEventListener('input', () => filterAndRender()));
+})();
+
+/* ---------- Offline / rate-limit fallback ---------- */
+function renderFallback() {
+  const repo = (name, lang, desc, date) =>
+    ({ name, language:lang, description:desc, html_url:`https://github.com/${GH_USER}/${name}`,
+       stargazers_count:0, forks_count:0, updated_at:date, created_at:date });
+
+  const fake = [
+    repo('Data-scientist-InfraRisk-AI', null, 'Infrastructure risk analysis for data science workloads.', new Date().toISOString()),
+    repo('Data-scientist-langChain-AI','Python','LangChain-based agent for data-science tasks.', new Date().toISOString()),
+    repo('Ai-researcher-agentic-models','Python','Agentic research models for AI automation.', '2026-07-20'),
+    repo('JesAI','TypeScript','AI-powered project — TypeScript implementation.', '2026-07-01'),
+    repo('Userspark-sparkAi','TypeScript','Spark-based AI automation platform.', '2026-06-30'),
+    repo('Spark-ai', null,'AI spark tools and utilities.', '2026-06-30'),
+    repo('Apex-Fitness','HTML','Responsive fitness landing page.', '2026-03-06'),
+    repo('Salman','HTML','Personal web project.', '2026-05-09'),
+    repo('salmanme', null,'Profile / sandbox.', '2022-10-28'),
+  ];
+  ALL_REPOS = fake;
+  renderStats({ public_repos:24, followers:0, following:2,
+                created_at:'2022-02-09T04:40:12Z' }, fake);
+  renderLangChart(fake);
+  renderRepos(fake);
+  renderTimeline(fake);
+}
+</script>
+
+</body>
+</html>
